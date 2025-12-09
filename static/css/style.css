@@ -543,12 +543,21 @@ body {
     background: var(--accent-strong);
     color: var(--user-bubble-text);
     padding: 14px 22px;
-    border-radius: 999px;
+    border-radius: 24px;
+    transition: border-radius 0.2s ease;
     max-width: min(75%, 480px);
     box-shadow: 0 8px 24px color-mix(in srgb, var(--accent-color) 40%, transparent);
     border: 1px solid rgba(255, 255, 255, 0.14);
     font-weight: 600;
     line-height: 1.6;
+}
+
+.message-wrapper[data-role="user"] .text-content.bubble-single-line {
+    border-radius: 999px;
+}
+
+.message-wrapper[data-role="user"] .text-content.bubble-multi-line {
+    border-radius: 24px;
 }
 
 .message-wrapper[data-role="user"] .text-content p {

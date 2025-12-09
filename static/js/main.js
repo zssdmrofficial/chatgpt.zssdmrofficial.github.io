@@ -540,6 +540,41 @@ function initCopyHandler(element) {
     });
 }
 
+function applyUserBubbleShape(textContentEl) {
+    if (!textContentEl) return;
+    const wrapper = textContentEl.closest('.message-wrapper');
+    if (!wrapper || wrapper.dataset.role !== 'user') return;
+
+    const styles = window.getComputedStyle(textContentEl);
+    const lineHeight = parseFloat(styles.lineHeight) || 0;
+    const paddingTop = parseFloat(styles.paddingTop) || 0;
+    const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+    if (!lineHeight) return;
+
+    const contentHeight = textContentEl.scrollHeight - paddingTop - paddingBottom;
+    const isMultiLine = contentHeight > (lineHeight + 1);
+
+    textContentEl.classList.remove('bubble-single-line', 'bubble-multi-line');
+    textContentEl.classList.add(isMultiLine ? 'bubble-multi-line' : 'bubble-single-line');
+}
+
+function refreshAllUserBubbleShapes() {
+    if (!chatBoxEl) return;
+    const bubbles = chatBoxEl.querySelectorAll('.message-wrapper[data-role="user"] .text-content');
+    bubbles.forEach((bubble) => applyUserBubbleShape(bubble));
+}
+
+let bubbleShapeRefreshHandle = null;
+function scheduleBubbleShapeRefresh() {
+    if (bubbleShapeRefreshHandle) return;
+    bubbleShapeRefreshHandle = requestAnimationFrame(() => {
+        bubbleShapeRefreshHandle = null;
+        refreshAllUserBubbleShapes();
+    });
+}
+
+window.addEventListener('resize', scheduleBubbleShapeRefresh);
+
 function renderMessage(role, content, isError = false, displayContent = null, messageIndex = null) {
     const isUser = role === "user";
     const msgDiv = document.createElement('div');
@@ -599,6 +634,8 @@ function renderMessage(role, content, isError = false, displayContent = null, me
 
     requestAnimationFrame(() => {
         chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
+        const textEl = msgDiv.querySelector('.text-content');
+        applyUserBubbleShape(textEl);
     });
 }
 
